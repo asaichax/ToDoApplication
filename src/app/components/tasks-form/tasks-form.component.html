@@ -1,0 +1,48 @@
+<!-- Main container with padding and centering -->
+<div class="container mx-auto py-10">
+  <!-- Task input form -->
+  <form class="w-full max-w-lg">
+    <div class="flex flex-wrap -mx-3 mb-6">
+      <!-- Task Name Input Field -->
+      <div class="w-full px-3 mb-6">
+        <!-- Using ngModel for two-way data binding -->
+        <input
+          [(ngModel)]="newTask.name"
+          name="taskName"
+          class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-teal-500"
+          type="text"
+          placeholder="Task name"
+        />
+      </div>
+
+      <!-- Task Description Textarea -->
+      <div class="w-full px-3">
+        <!-- Using ngModel for two-way data binding -->
+        <textarea
+          [(ngModel)]="newTask.description"
+          name="taskDescription"
+          class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-teal-500"
+          placeholder="Task description"
+          rows="3"
+        ></textarea>
+      </div>
+
+      <!-- Add Task Button -->
+      <div class="w-full px-3 mt-4">
+        <button
+          type="button"
+          (click)="addTask()"
+          class="w-full bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Add Task
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<!-- Tasks List Component -->
+<div>
+  <app-tasks-list [tasks]="tasks"></app-tasks-list>
+</div>
+

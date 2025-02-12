@@ -1,0 +1,67 @@
+<!-- Only show container if there are tasks -->
+<div *ngIf="tasks.length > 0" class="container mx-auto py-4">
+  <!-- Iterate over tasks array -->
+  <div *ngFor="let task of tasks" class="bg-gray-100 p-4 mb-4 rounded-lg">
+    <div class="flex items-center justify-between">
+      <!-- Task Content Section -->
+      <div class="flex-1">
+        <!-- Task ID and Name Header -->
+        <div class="flex items-center gap-2">
+          <!-- Task ID Display -->
+          <span class="text-sm font-medium text-gray-500">Task #{{ task.id }}</span>
+          <!-- Task Name with conditional strike-through -->
+          <h3
+            [class.line-through]="task.completed"
+            class="text-lg font-semibold text-gray-800"
+          >
+            {{ task.name }}
+          </h3>
+        </div>
+        <!-- Task Description with conditional strike-through -->
+        <p
+          [class.line-through]="task.completed"
+          class="text-gray-600 mt-1"
+        >
+          {{ task.description }}
+        </p>
+      </div>
+
+      <!-- Action Buttons Section -->
+      <div class="flex items-center justify-end ml-4">
+        <!-- Delete Task Button -->
+        <span (click)="removeTask(task)" style="cursor: pointer">
+          <svg
+            class="h-8 w-8 text-red-500"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        </span>
+        <!-- Toggle Complete Button -->
+        <span (click)="toggleCompleted(task)" style="cursor: pointer">
+          <svg
+            class="h-8 w-8 text-green-500"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
