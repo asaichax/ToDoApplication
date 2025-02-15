@@ -88,3 +88,56 @@
   </div>
 </ng-container>
 
+<!-- Error messages -->
+<div *ngIf="errors$ | async as error" class="error-message">
+  {{ error }}
+</div>
+
+<!-- Task Statistics -->
+<div *ngIf="taskStats$ | async as stats" class="stats-container">
+  <div class="stat-item">
+    <span class="stat-label">Total Tasks:</span>
+    <span class="stat-value">{{ stats.total }}</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-label">Completed:</span>
+    <span class="stat-value">{{ stats.completed }}</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-label">Pending:</span>
+    <span class="stat-value">{{ stats.pending }}</span>
+  </div>
+</div>
+
+<!-- Add some styles -->
+<style>
+  .stats-container {
+    display: flex;
+    justify-content: space-around;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+  }
+  .stat-item {
+    text-align: center;
+  }
+  .stat-label {
+    display: block;
+    color: #6c757d;
+    font-size: 0.875rem;
+  }
+  .stat-value {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #2c3e50;
+  }
+  .error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+  }
+</style>
+
