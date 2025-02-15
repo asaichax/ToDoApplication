@@ -1,87 +1,90 @@
-<!-- Only show container if there are tasks -->
-<div *ngIf="tasks.length > 0" class="container mx-auto py-4">
-  <!-- Iterate over tasks array -->
-  <div *ngFor="let task of tasks" 
-       [ngClass]="{'bg-gray-100': !task.completed, 'bg-green-50': task.completed}"
-       class="p-4 mb-4 rounded-lg"
-       [ngStyle]="{'opacity': task.completed ? '0.8' : '1'}">
-    <div class="flex items-center justify-between">
-      <!-- Task Content Section -->
-      <div class="flex-1">
-        <!-- Task Header -->
-        <div class="flex items-center gap-2">
-          <!-- Task ID and Creation Time -->
-          <span class="text-sm font-medium" 
-                [ngStyle]="{'color': task.completed ? '#4CAF50' : '#6B7280'}">
-            Task #{{ task.id }} - Created {{ task.createdAt | date:'medium' }}
-          </span>
-          <!-- Task Status Badge -->
-          <span class="px-2 py-1 rounded-full text-xs"
-                [ngClass]="{
-                  'bg-blue-100 text-blue-800': !task.completed,
-                  'bg-green-100 text-green-800': task.completed
-                }">
-            {{ task.completed | taskStatus }}
-          </span>
+<!-- Using async pipe for tasks -->
+<ng-container *ngIf="tasks$ | async as tasks">
+  <!-- Only show container if there are tasks -->
+  <div *ngIf="tasks.length > 0" class="container mx-auto py-4">
+    <!-- Iterate over tasks array -->
+    <div *ngFor="let task of tasks" 
+         [ngClass]="{'bg-gray-100': !task.completed, 'bg-green-50': task.completed}"
+         class="p-4 mb-4 rounded-lg"
+         [ngStyle]="{'opacity': task.completed ? '0.8' : '1'}">
+      <div class="flex items-center justify-between">
+        <!-- Task Content Section -->
+        <div class="flex-1">
+          <!-- Task Header -->
+          <div class="flex items-center gap-2">
+            <!-- Task ID and Creation Time -->
+            <span class="text-sm font-medium" 
+                  [ngStyle]="{'color': task.completed ? '#4CAF50' : '#6B7280'}">
+              Task #{{ task.id }} - Created {{ task.createdAt | date:'medium' }}
+            </span>
+            <!-- Task Status Badge -->
+            <span class="px-2 py-1 rounded-full text-xs"
+                  [ngClass]="{
+                    'bg-blue-100 text-blue-800': !task.completed,
+                    'bg-green-100 text-green-800': task.completed
+                  }">
+              {{ task.completed | taskStatus }}
+            </span>
+          </div>
+          <!-- Task Name with dynamic classes -->
+          <h3 [ngClass]="{
+              'line-through': task.completed,
+              'text-gray-800': !task.completed,
+              'text-green-700': task.completed
+            }"
+            class="text-lg font-semibold">
+            {{ task.name | titlecase }}
+          </h3>
+          <!-- Task Description -->
+          <p [ngClass]="{
+              'line-through': task.completed,
+              'text-gray-600': !task.completed,
+              'text-green-600': task.completed
+            }"
+            class="mt-1">
+            {{ task.description | slice:0:100 }}{{ task.description.length > 100 ? '...' : '' }}
+          </p>
+          <!-- Task Metadata -->
+          <div class="mt-2 text-sm text-gray-500">
+            <span>Last updated: {{ task.updatedAt | date:'short' }}</span>
+            <span class="ml-4">Time since creation: {{ task.createdAt | timeAgo }}</span>
+          </div>
         </div>
-        <!-- Task Name with dynamic classes -->
-        <h3 [ngClass]="{
-            'line-through': task.completed,
-            'text-gray-800': !task.completed,
-            'text-green-700': task.completed
-          }"
-          class="text-lg font-semibold">
-          {{ task.name | titlecase }}
-        </h3>
-        <!-- Task Description -->
-        <p [ngClass]="{
-            'line-through': task.completed,
-            'text-gray-600': !task.completed,
-            'text-green-600': task.completed
-          }"
-          class="mt-1">
-          {{ task.description | slice:0:100 }}{{ task.description.length > 100 ? '...' : '' }}
-        </p>
-        <!-- Task Metadata -->
-        <div class="mt-2 text-sm text-gray-500">
-          <span>Last updated: {{ task.updatedAt | date:'short' }}</span>
-          <span class="ml-4">Time since creation: {{ task.createdAt | timeAgo }}</span>
-        </div>
-      </div>
 
-      <!-- Action Buttons Section -->
-      <div class="flex items-center justify-end ml-4">
-        <!-- Delete Button -->
-        <span (click)="removeTask(task)" 
-              [ngStyle]="{'cursor': 'pointer'}"
-              class="hover:scale-110 transition-transform">
-          <svg class="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                  d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-        </span>
-        <!-- Complete Button -->
-        <span (click)="toggleCompleted(task)" 
-              [ngStyle]="{'cursor': 'pointer'}"
-              class="hover:scale-110 transition-transform">
-          <svg [ngClass]="{
-                'text-green-500': !task.completed,
-                'text-green-700': task.completed
-              }"
-              class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-        </span>
+        <!-- Action Buttons Section -->
+        <div class="flex items-center justify-end ml-4">
+          <!-- Delete Button -->
+          <span (click)="removeTask(task)" 
+                [ngStyle]="{'cursor': 'pointer'}"
+                class="hover:scale-110 transition-transform">
+            <svg class="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </span>
+          <!-- Complete Button -->
+          <span (click)="toggleCompleted(task)" 
+                [ngStyle]="{'cursor': 'pointer'}"
+                class="hover:scale-110 transition-transform">
+            <svg [ngClass]="{
+                  'text-green-500': !task.completed,
+                  'text-green-700': task.completed
+                }"
+                class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </span>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<!-- No tasks message -->
-<div *ngIf="tasks.length === 0" 
-     class="text-center py-8"
-     [ngStyle]="{'color': '#666'}">
-  <p class="text-xl">No tasks available. Create a new task to get started!</p>
-</div>
+  <!-- No tasks message -->
+  <div *ngIf="tasks.length === 0" 
+       class="text-center py-8"
+       [ngStyle]="{'color': '#666'}">
+    <p class="text-xl">No tasks available. Create a new task to get started!</p>
+  </div>
+</ng-container>
 

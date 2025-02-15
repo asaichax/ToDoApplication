@@ -1,27 +1,27 @@
-import { Component, Input, type OnInit } from "@angular/core"
+import { Component, OnInit } from "@angular/core"
 import type { Task } from "../../constants/tasks.interface"
 import { TaskService } from '../../services/task.service'
+import { Observable } from 'rxjs'
 
 @Component({
   selector: "app-tasks-list",
   templateUrl: "./tasks-list.component.html",
 })
 export class TasksListComponent implements OnInit {
-  // Input decorator marks tasks property as input from parent component
-  @Input() tasks: Task[]
+  tasks$: Observable<Task[]>
 
-  constructor(private taskService: TaskService) {}
-
-  ngOnInit(): void {
-    this.tasks = this.taskService.getTasks()
+  constructor(private taskService: TaskService) {
+    this.tasks$ = this.taskService.getTasks()
   }
+
+  ngOnInit(): void {}
 
   /**
    * Removes a task from the tasks array
    * @param task The task to be removed
    */
   removeTask(task: Task) {
-    this.taskService.removeTask(task)
+    this.taskService.removeTask(task.id).subscribe()
   }
 
   /**
@@ -29,8 +29,7 @@ export class TasksListComponent implements OnInit {
    * @param task The task to toggle
    */
   toggleCompleted(task: Task) {
-    // Flip the completed boolean value
-    task.completed = !task.completed
+    this.taskService.toggleTaskComplete(task).subscribe()
   }
 }
 

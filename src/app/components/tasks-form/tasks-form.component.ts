@@ -93,9 +93,12 @@ export class TasksFormComponent {
     name: '',
     title: '',
     description: '',
-    completed: false
+    completed: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
   };
   showSuccess = false;
+  isSubmitting = false;
 
   constructor(
     private router: Router,
@@ -103,18 +106,34 @@ export class TasksFormComponent {
   ) {}
 
   onSubmit() {
-    this.taskService.addTask(this.task);
-    this.showSuccess = true;
-    // Reset form for new task
+    if (this.isSubmitting) return;
+    
+    this.isSubmitting = true;
+    this.taskService.addTask(this.task).subscribe({
+      next: () => {
+        this.showSuccess = true;
+        this.isSubmitting = false;
+        this.resetForm();
+        setTimeout(() => this.showSuccess = false, 3000);
+      },
+      error: (error) => {
+        console.error('Error creating task:', error);
+        this.isSubmitting = false;
+        // Handle error (show error message to user)
+      }
+    });
+  }
+
+  private resetForm() {
     this.task = {
       id: 0,
       name: '',
       title: '',
       description: '',
-      completed: false
+      completed: false,
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
-    // Hide success message after 3 seconds
-    setTimeout(() => this.showSuccess = false, 3000);
   }
 }
 
