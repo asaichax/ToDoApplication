@@ -31,7 +31,9 @@ import { TaskService } from '../../services/task.service';
             class="form-control">
           </textarea>
         </div>
-        <button type="submit" [disabled]="!taskForm.form.valid">Create Task</button>
+        <button type="submit" [disabled]="!taskForm.form.valid || isSubmitting">
+          {{ isSubmitting ? 'Creating...' : 'Create Task' }}
+        </button>
       </form>
     </div>
   `,
@@ -101,14 +103,15 @@ export class TasksFormComponent {
   isSubmitting = false;
 
   constructor(
-    private router: Router,
     private taskService: TaskService
   ) {}
 
   onSubmit() {
-    if (this.isSubmitting) return;
+    if (this.isSubmitting || !this.task.title) return;
     
     this.isSubmitting = true;
+    this.task.name = this.task.title; // Sync name with title
+
     this.taskService.addTask(this.task).subscribe({
       next: () => {
         this.showSuccess = true;

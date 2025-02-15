@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, Subject } from 'rxjs';
+import { Observable, BehaviorSubject, Subject, of } from 'rxjs';
 import { tap, catchError, map, shareReplay } from 'rxjs/operators';
 import { Task } from '../constants/tasks.interface';
 
@@ -8,9 +8,8 @@ import { Task } from '../constants/tasks.interface';
   providedIn: 'root'
 })
 export class TaskService {
-  private apiUrl = 'http://localhost:3000/tasks'; // Update with your API URL
+  private nextId = 1;
   private tasksSubject = new BehaviorSubject<Task[]>([]);
-  private refreshTrigger = new Subject<void>();
   private errorSubject = new Subject<string>();
 
   tasks$ = this.tasksSubject.asObservable();
@@ -34,27 +33,14 @@ export class TaskService {
     shareReplay(1)
   );
 
-  constructor(private http: HttpClient) {
-    // Initialize data load
-    this.refreshTrigger.pipe(
-      tap(() => this.loadTasks())
-    ).subscribe();
-    
-    // Initial load
-    this.refresh();
-  }
-
-  refresh(): void {
-    this.refreshTrigger.next();
-  }
-
-  private loadTasks(): void {
-    this.http.get<Task[]>(this.apiUrl).pipe(
-      catchError(error => {
-        this.errorSubject.next('Failed to load tasks');
-        throw error;
-      })
-    ).subscribe(tasks => this.tasksSubject.next(tasks));
+  constructor() {
+    // Load tasks from localStorage on initialization
+    const savedTasks = localStorage.getItem('tasks');
+    if (savedTasks) {
+      const tasks = JSON.parse(savedTasks);
+      this.tasksSubject.next(tasks);
+      this.nextId = Math.max(...tasks.map((t: Task) => t.id), 0) + 1;
+    }
   }
 
   getTasks(): Observable<Task[]> {
@@ -65,43 +51,52 @@ export class TaskService {
     const now = new Date();
     const newTask = {
       ...task,
+      id: this.nextId++,
       createdAt: now,
       updatedAt: now
     };
 
-    return this.http.post<Task>(this.apiUrl, newTask).pipe(
-      tap(createdTask => {
-        const currentTasks = this.tasksSubject.value;
-        this.tasksSubject.next([...currentTasks, createdTask]);
-      })
-    );
+    const currentTasks = this.tasksSubject.value;
+    const updatedTasks = [...currentTasks, newTask];
+    
+    // Save to localStorage
+    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+    this.tasksSubject.next(updatedTasks);
+
+    return of(newTask);
   }
 
   removeTask(taskId: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${taskId}`).pipe(
-      tap(() => {
-        const currentTasks = this.tasksSubject.value;
-        this.tasksSubject.next(currentTasks.filter(task => task.id !== taskId));
-      })
-    );
+    const currentTasks = this.tasksSubject.value;
+    const updatedTasks = currentTasks.filter(task => task.id !== taskId);
+    
+    // Save to localStorage
+    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+    this.tasksSubject.next(updatedTasks);
+
+    return of(void 0);
   }
 
   updateTask(task: Task): Observable<Task> {
-    const updatedTask = {
-      ...task,
-      updatedAt: new Date()
-    };
-
-    return this.http.put<Task>(`${this.apiUrl}/${task.id}`, updatedTask).pipe(
-      tap(updated => {
-        const currentTasks = this.tasksSubject.value;
-        const index = currentTasks.findIndex(t => t.id === updated.id);
-        if (index !== -1) {
-          currentTasks[index] = updated;
-          this.tasksSubject.next([...currentTasks]);
-        }
-      })
-    );
+    const currentTasks = this.tasksSubject.value;
+    const index = currentTasks.findIndex(t => t.id === task.id);
+    
+    if (index !== -1) {
+      const updatedTask = {
+        ...task,
+        updatedAt: new Date()
+      };
+      const updatedTasks = [...currentTasks];
+      updatedTasks[index] = updatedTask;
+      
+      // Save to localStorage
+      localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+      this.tasksSubject.next(updatedTasks);
+      
+      return of(updatedTask);
+    }
+    
+    return of(task);
   }
 
   toggleTaskComplete(task: Task): Observable<Task> {
@@ -109,5 +104,10 @@ export class TaskService {
       ...task,
       completed: !task.completed
     });
+  }
+
+  refresh(): void {
+    // For localStorage implementation, we don't need to do anything here
+    // as data is already in memory
   }
 } 
