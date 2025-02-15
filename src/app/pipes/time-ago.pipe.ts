@@ -1,9 +1,17 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
+/**
+ * Pipe that transforms a date into a relative time string
+ */
 @Pipe({
   name: 'timeAgo'
 })
 export class TimeAgoPipe implements PipeTransform {
+  /**
+   * Transform a date into a relative time string
+   * @param value The date to transform
+   * @returns A string like "2 hours ago" or "Just now"
+   */
   transform(value: Date): string {
     if (!value) return '';
 
