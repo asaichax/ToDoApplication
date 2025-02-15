@@ -8,6 +8,8 @@ import { TasksFormComponent } from './components/tasks-form/tasks-form.component
 import { FormsModule } from '@angular/forms';
 import { TasksListComponent } from './components/tasks-list/tasks-list.component';
 import { HomeComponent } from './components/home/home.component';
+import { TaskStatusPipe } from './pipes/task-status.pipe';
+import { TimeAgoPipe } from './pipes/time-ago.pipe';
 
 @NgModule({
   declarations: [
@@ -15,7 +17,9 @@ import { HomeComponent } from './components/home/home.component';
     NavbarComponent,
     TasksListComponent,
     TasksFormComponent,
-    HomeComponent
+    HomeComponent,
+    TaskStatusPipe,
+    TimeAgoPipe
   ],
   imports: [
     BrowserModule,

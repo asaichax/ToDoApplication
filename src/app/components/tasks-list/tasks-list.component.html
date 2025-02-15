@@ -8,23 +8,31 @@
     <div class="flex items-center justify-between">
       <!-- Task Content Section -->
       <div class="flex-1">
-        <!-- Task ID and Name Header -->
+        <!-- Task Header -->
         <div class="flex items-center gap-2">
-          <!-- Task ID Display -->
+          <!-- Task ID and Creation Time -->
           <span class="text-sm font-medium" 
                 [ngStyle]="{'color': task.completed ? '#4CAF50' : '#6B7280'}">
-            Task #{{ task.id }}
+            Task #{{ task.id }} - Created {{ task.createdAt | date:'medium' }}
           </span>
-          <!-- Task Name with dynamic classes -->
-          <h3 [ngClass]="{
-              'line-through': task.completed,
-              'text-gray-800': !task.completed,
-              'text-green-700': task.completed
-            }"
-            class="text-lg font-semibold">
-            {{ task.name }}
-          </h3>
+          <!-- Task Status Badge -->
+          <span class="px-2 py-1 rounded-full text-xs"
+                [ngClass]="{
+                  'bg-blue-100 text-blue-800': !task.completed,
+                  'bg-green-100 text-green-800': task.completed
+                }">
+            {{ task.completed | taskStatus }}
+          </span>
         </div>
+        <!-- Task Name with dynamic classes -->
+        <h3 [ngClass]="{
+            'line-through': task.completed,
+            'text-gray-800': !task.completed,
+            'text-green-700': task.completed
+          }"
+          class="text-lg font-semibold">
+          {{ task.name | titlecase }}
+        </h3>
         <!-- Task Description -->
         <p [ngClass]="{
             'line-through': task.completed,
@@ -32,8 +40,13 @@
             'text-green-600': task.completed
           }"
           class="mt-1">
-          {{ task.description }}
+          {{ task.description | slice:0:100 }}{{ task.description.length > 100 ? '...' : '' }}
         </p>
+        <!-- Task Metadata -->
+        <div class="mt-2 text-sm text-gray-500">
+          <span>Last updated: {{ task.updatedAt | date:'short' }}</span>
+          <span class="ml-4">Time since creation: {{ task.createdAt | timeAgo }}</span>
+        </div>
       </div>
 
       <!-- Action Buttons Section -->

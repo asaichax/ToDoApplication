@@ -13,8 +13,11 @@ export class TaskService {
   }
 
   addTask(task: Task): void {
+    const now = new Date();
     task.id = this.nextId++;
-    task.name = task.title; // Sync name and title
+    task.name = task.title;
+    task.createdAt = now;
+    task.updatedAt = now;
     this.tasks.push(task);
   }
 
@@ -23,5 +26,10 @@ export class TaskService {
     if (index !== -1) {
       this.tasks.splice(index, 1);
     }
+  }
+
+  toggleTaskComplete(task: Task): void {
+    task.completed = !task.completed;
+    task.updatedAt = new Date();
   }
 } 
